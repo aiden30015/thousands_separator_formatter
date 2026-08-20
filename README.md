@@ -22,7 +22,8 @@ input breaks mid-composition. This one handles those cases.
   no extra configuration, because anything that is not the separator is treated
   as a value character.
 - **Configurable grouping.** The separator, group size, and decimal handling
-  are explicit parameters.
+  are explicit parameters, with opt-in support for the Indian numbering
+  system's `1,23,45,678` pattern.
 - **No dependencies.** Pure Flutter; no `intl`.
 
 ## Getting started
@@ -64,6 +65,7 @@ TextField(
 | `groupSize` | `3` | Characters per group. |
 | `allowDecimal` | `false` | When true, text at and after `decimalSeparator` is left ungrouped. |
 | `decimalSeparator` | `'.'` | Character introducing the fractional part. |
+| `indianGrouping` | `false` | When true, groups as `1,23,45,678`; `groupSize` does not apply. |
 
 ```dart
 // Space-separated groups of two: 100000 -> "10 00 00"
@@ -71,7 +73,24 @@ const ThousandsSeparatorTextInputFormatter(separator: ' ', groupSize: 2);
 
 // Group only the integer part: 1234.5678 -> "1,234.5678"
 const ThousandsSeparatorTextInputFormatter(allowDecimal: true);
+
+// Indian numbering system: 12345678 -> "1,23,45,678"
+const ThousandsSeparatorTextInputFormatter(indianGrouping: true);
 ```
+
+### Indian numbering system
+
+Set `indianGrouping` to group the last three characters together and everything
+before them in twos, the convention used for Indian rupee amounts:
+
+| Input | Default | `indianGrouping: true` |
+| --- | --- | --- |
+| `99999` | `99,999` | `99,999` |
+| `100000` | `100,000` | `1,00,000` |
+| `12345678` | `12,345,678` | `1,23,45,678` |
+
+The 3-then-2 widths are fixed, so `groupSize` is ignored when `indianGrouping`
+is true. `separator`, `allowDecimal`, and `decimalSeparator` still apply.
 
 A complete example is in the [`example/`][example] folder.
 
@@ -88,8 +107,9 @@ Pick values appropriate for your user's locale.
 - **Locale-aware defaults.** The formatter never inspects the ambient locale.
   For formatting values that are already committed rather than being typed, use
   [`NumberFormat`][numberformat] from the `intl` package.
-- **Variable group sizes.** `groupSize` is a single value, so conventions that
-  mix group widths — such as the Indian `1,00,000` pattern — are out of scope.
+- **Arbitrary variable group sizes.** Apart from `indianGrouping`, `groupSize`
+  is a single value, so other conventions that mix group widths are out of
+  scope.
 - **Input filtering.** Use `FilteringTextInputFormatter` for that.
 
 ### Issues

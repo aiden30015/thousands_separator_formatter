@@ -55,6 +55,7 @@ class ThousandsSeparatorTextInputFormatter extends TextInputFormatter {
     this.groupSize = 3,
     this.allowDecimal = false,
     this.decimalSeparator = '.',
+    this.indianGrouping = false,
   }) : assert(separator.length == 1),
        assert(decimalSeparator.length == 1),
        assert(separator != decimalSeparator),
@@ -67,9 +68,8 @@ class ThousandsSeparatorTextInputFormatter extends TextInputFormatter {
 
   /// The number of characters in each group.
   ///
-  /// Defaults to 3, producing groups such as `1,000,000`. Other values can be
-  /// used for grouping conventions such as the Indian numbering system, where a
-  /// [groupSize] is not sufficient on its own to express the `1,00,000` pattern.
+  /// Defaults to 3, producing groups such as `1,000,000`. Ignored when
+  /// [indianGrouping] is true, which uses a fixed 3-then-2 pattern.
   final int groupSize;
 
   /// Whether the input may contain a fractional part introduced by
@@ -84,6 +84,14 @@ class ThousandsSeparatorTextInputFormatter extends TextInputFormatter {
   ///
   /// Only meaningful when [allowDecimal] is true. Defaults to a period (`.`).
   final String decimalSeparator;
+
+  /// Whether to group using the Indian numbering system.
+  ///
+  /// When true, the last three characters form one group and everything before
+  /// it is grouped in twos, formatting `12345678` as `1,23,45,678`. This
+  /// pattern mixes group widths, so [groupSize] does not apply. Defaults to
+  /// false.
+  final bool indianGrouping;
 
   @override
   TextEditingValue formatEditUpdate(
@@ -114,7 +122,9 @@ class ThousandsSeparatorTextInputFormatter extends TextInputFormatter {
         ? ''
         : value.substring(decimalIndex);
 
-    final String formatted = _group(integerPart) + fractionPart;
+    final String formatted =
+        (indianGrouping ? _groupIndian(integerPart) : _group(integerPart)) +
+        fractionPart;
 
     if (formatted == newText) {
       return newValue;
@@ -199,6 +209,37 @@ class ThousandsSeparatorTextInputFormatter extends TextInputFormatter {
       buffer.write(separator);
       buffer.write(digits.substring(i, i + groupSize));
     }
+    return buffer.toString();
+  }
+
+  // Inserts [separator] using the Indian numbering system: the last three
+  // characters form one group and everything before it is grouped in twos,
+  // preserving an optional leading sign character.
+  String _groupIndian(String digits) {
+    var start = 0;
+    var sign = '';
+    if (digits.isNotEmpty && (digits[0] == '-' || digits[0] == '+')) {
+      sign = digits[0];
+      start = 1;
+    }
+    if (digits.length - start <= 3) {
+      return digits;
+    }
+
+    // Everything before the trailing three characters is grouped in twos, so an
+    // odd number of leading characters leaves one on its own in the first
+    // group.
+    final int split = digits.length - 3;
+    final int firstGroup = (split - start).isOdd ? 1 : 2;
+
+    final buffer = StringBuffer(sign);
+    buffer.write(digits.substring(start, start + firstGroup));
+    for (int i = start + firstGroup; i < split; i += 2) {
+      buffer.write(separator);
+      buffer.write(digits.substring(i, i + 2));
+    }
+    buffer.write(separator);
+    buffer.write(digits.substring(split));
     return buffer.toString();
   }
 }
