@@ -127,6 +127,34 @@ void main() {
       expect(reversed.selection.extentOffset, 1);
     });
 
+    test('groups using the Indian numbering system', () {
+      const formatter = ThousandsSeparatorTextInputFormatter(
+        indianGrouping: true,
+      );
+      expect(format(formatter, '1').text, '1');
+      expect(format(formatter, '999').text, '999');
+      expect(format(formatter, '1000').text, '1,000');
+      // The boundary where grouping switches from threes to twos.
+      expect(format(formatter, '99999').text, '99,999');
+      expect(format(formatter, '100000').text, '1,00,000');
+      expect(format(formatter, '1234567').text, '12,34,567');
+      expect(format(formatter, '12345678').text, '1,23,45,678');
+      expect(format(formatter, '-12345678').text, '-1,23,45,678');
+    });
+
+    test('Indian grouping keeps the caret next to the same digit', () {
+      const formatter = ThousandsSeparatorTextInputFormatter(
+        indianGrouping: true,
+      );
+      final TextEditingValue result = format(
+        formatter,
+        '100000',
+        selection: 1,
+      );
+      expect(result.text, '1,00,000');
+      expect(result.selection.baseOffset, 1);
+    });
+
     test('does not reformat during composition', () {
       const formatter = ThousandsSeparatorTextInputFormatter();
       const composing = TextEditingValue(

@@ -2,7 +2,7 @@ name: thousands_separator_formatter
 description: >-
   A TextInputFormatter that inserts thousands separators into a TextField as
   the user types, keeping the caret next to the same character.
-version: 1.0.0
+version: 1.1.0
 repository: https://github.com/aiden30015/thousands_separator_formatter
 issue_tracker: https://github.com/aiden30015/thousands_separator_formatter/issues
 
