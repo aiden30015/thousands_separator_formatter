@@ -92,20 +92,10 @@ Pick values appropriate for your user's locale.
   mix group widths — such as the Indian `1,00,000` pattern — are out of scope.
 - **Input filtering.** Use `FilteringTextInputFormatter` for that.
 
-### Background
-
-This started as [flutter/flutter#188243][pr], a proposal to add the formatter to
-`package:flutter/services.dart` for [flutter/flutter#188152][issue]. Per the
-Flutter [style guide][styleguide], self-contained features are published as
-packages first, so it lives here.
-
 ### Issues
 
 File bugs and feature requests on the [issue tracker][tracker].
 
 [example]: https://github.com/aiden30015/thousands_separator_formatter/tree/main/example
 [numberformat]: https://pub.dev/documentation/intl/latest/intl/NumberFormat-class.html
-[pr]: https://github.com/flutter/flutter/pull/188243
-[issue]: https://github.com/flutter/flutter/issues/188152
-[styleguide]: https://github.com/flutter/flutter/blob/master/docs/contributing/Style-guide-for-Flutter-repo.md#deciding-where-to-put-code
 [tracker]: https://github.com/aiden30015/thousands_separator_formatter/issues
