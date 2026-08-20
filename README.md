@@ -1,8 +1,50 @@
-# thousands_separator_formatter
+[![pub package](https://img.shields.io/pub/v/thousands_separator_formatter.svg)](https://pub.dev/packages/thousands_separator_formatter)
+[![license: BSD-3-Clause](https://img.shields.io/badge/license-BSD--3--Clause-blue.svg)](https://github.com/aiden30015/thousands_separator_formatter/blob/main/LICENSE)
 
 A `TextInputFormatter` that inserts thousands separators into a `TextField` as
 the user types — `1000000` becomes `1,000,000` — while keeping the caret next
 to the same character.
+
+Most hand-rolled grouping formatters get the display right and the editing
+wrong: the caret jumps to the end of the field, selections collapse, and IME
+input breaks mid-composition. This one handles those cases.
+
+## Features
+
+- **Caret stability.** Editing in the middle of `1,234,567` leaves the caret
+  next to the character you typed instead of jumping to the end.
+- **Selection preservation.** A non-collapsed selection keeps covering the same
+  characters, and a reversed selection keeps its direction.
+- **IME safe.** Reformatting is skipped while a composing region is active, so
+  Korean, Japanese, and Chinese input methods are not interrupted
+  mid-composition.
+- **Non-Western digits.** Persian and Arabic-Indic digits group correctly with
+  no extra configuration, because anything that is not the separator is treated
+  as a value character.
+- **Configurable grouping.** The separator, group size, and decimal handling
+  are explicit parameters.
+- **No dependencies.** Pure Flutter; no `intl`.
+
+## Getting started
+
+Add the package:
+
+```console
+flutter pub add thousands_separator_formatter
+```
+
+Then import it:
+
+```dart
+import 'package:thousands_separator_formatter/thousands_separator_formatter.dart';
+```
+
+## Usage
+
+Pass the formatter to `TextField.inputFormatters`. The formatter only groups
+characters; it does not restrict what can be entered. Compose it with
+`FilteringTextInputFormatter.digitsOnly` to limit input to digits, with the
+filter first so grouping runs on the already-filtered value:
 
 ```dart
 TextField(
@@ -14,23 +56,7 @@ TextField(
 )
 ```
 
-## Why another formatter
-
-Most hand-rolled thousands-separator formatters get the easy case right and the
-editing cases wrong. This one handles:
-
-- **Caret stability.** Editing in the middle of `1,234,567` keeps the caret next
-  to the character you typed, instead of jumping to the end of the field.
-- **Selections.** A non-collapsed selection keeps covering the same characters,
-  and a reversed selection keeps its direction.
-- **IME composition.** Reformatting is skipped while a composing region is
-  active, so Korean, Japanese and Chinese input methods are not interrupted
-  mid-composition.
-- **Non-Western digits.** Persian and Arabic-Indic digits group correctly with
-  no extra configuration, because anything that is not the separator is treated
-  as a value character.
-
-## Options
+### Options
 
 | Parameter | Default | Description |
 | --- | --- | --- |
@@ -47,26 +73,39 @@ const ThousandsSeparatorTextInputFormatter(separator: ' ', groupSize: 2);
 const ThousandsSeparatorTextInputFormatter(allowDecimal: true);
 ```
 
-## Locale
+A complete example is in the [`example/`][example] folder.
 
-`separator`, `groupSize` and `decimalSeparator` are explicit parameters rather
+## Additional information
+
+### Locale
+
+`separator`, `groupSize`, and `decimalSeparator` are explicit parameters rather
 than being derived from a locale, so this package has no dependency on `intl`.
-Pick values appropriate for your user's locale. For locale-aware formatting of
-values that are already committed (rather than being typed), use
-[`NumberFormat`](https://pub.dev/documentation/intl/latest/intl/NumberFormat-class.html)
-from the `intl` package.
+Pick values appropriate for your user's locale.
 
-## Composition
+### Not supported
 
-The formatter only groups; it does not restrict what can be entered. Compose it
-with `FilteringTextInputFormatter.digitsOnly` — the filter first, so grouping
-runs on the already-filtered value.
+- **Locale-aware defaults.** The formatter never inspects the ambient locale.
+  For formatting values that are already committed rather than being typed, use
+  [`NumberFormat`][numberformat] from the `intl` package.
+- **Variable group sizes.** `groupSize` is a single value, so conventions that
+  mix group widths — such as the Indian `1,00,000` pattern — are out of scope.
+- **Input filtering.** Use `FilteringTextInputFormatter` for that.
 
-## Background
+### Background
 
-This started as [flutter/flutter#188243](https://github.com/flutter/flutter/pull/188243),
-a proposal to add the formatter to `package:flutter/services.dart` for
-[flutter/flutter#188152](https://github.com/flutter/flutter/issues/188152). Per
-the Flutter
-[style guide](https://github.com/flutter/flutter/blob/master/docs/contributing/Style-guide-for-Flutter-repo.md#deciding-where-to-put-code),
-self-contained features are published as packages first, so it lives here.
+This started as [flutter/flutter#188243][pr], a proposal to add the formatter to
+`package:flutter/services.dart` for [flutter/flutter#188152][issue]. Per the
+Flutter [style guide][styleguide], self-contained features are published as
+packages first, so it lives here.
+
+### Issues
+
+File bugs and feature requests on the [issue tracker][tracker].
+
+[example]: https://github.com/aiden30015/thousands_separator_formatter/tree/main/example
+[numberformat]: https://pub.dev/documentation/intl/latest/intl/NumberFormat-class.html
+[pr]: https://github.com/flutter/flutter/pull/188243
+[issue]: https://github.com/flutter/flutter/issues/188152
+[styleguide]: https://github.com/flutter/flutter/blob/master/docs/contributing/Style-guide-for-Flutter-repo.md#deciding-where-to-put-code
+[tracker]: https://github.com/aiden30015/thousands_separator_formatter/issues
