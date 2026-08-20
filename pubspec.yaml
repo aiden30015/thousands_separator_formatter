@@ -1,0 +1,26 @@
+name: thousands_separator_formatter
+description: >-
+  A TextInputFormatter that inserts thousands separators into a TextField as
+  the user types, keeping the caret next to the same character.
+version: 1.0.0
+repository: https://github.com/aiden30015/thousands_separator_formatter
+issue_tracker: https://github.com/aiden30015/thousands_separator_formatter/issues
+
+topics:
+  - text
+  - input
+  - formatter
+  - text-field
+
+environment:
+  sdk: ^3.10.1
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
